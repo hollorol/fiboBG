@@ -1,4 +1,3 @@
-
 typedef struct _color {
     float red;
     float green;
