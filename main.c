@@ -125,14 +125,13 @@ void drawFibbTime(cairo_t* cr, int width, int height){
 
     int bh = ((int) ((height - TOP_OFFSET) * BOX_HEIGHT_RATE) / 5) * 5;
     int unit = bh / 5;
-    int bw = bh / 5 * 8;
     
     int startpos_y = STARTPOS_Y + TOP_OFFSET + ((height - TOP_OFFSET - bh)/2);
     int startpos_x = (width - 8 * unit) / 2;
     
     myTime t=getTime();
     int colors[5];
-    getFibbTime(t, &colors);
+    getFibbTime(t, (int *) &colors);
     rectangle Rs[5];
 
     // TOP-LEFT BOX ( size 2 )
