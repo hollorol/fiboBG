@@ -123,7 +123,6 @@ void drawReminder(cairo_t* cr, int minRem){
         previous = minRem - 1;
     }
 
-    float radius=10;
     for(int i = 0; i < 4; ++i){
         cairo_arc(cr, x_pos[i], y_pos[i],10, 0, 2 * M_PI);
         cairo_set_source_rgb(cr, 0.5,  0.5, 0.5);   /* set fill color */
@@ -213,7 +212,7 @@ int main() {
             1         /* number of elements */
             );
 
-	/* XSetWindowBackgroundPixmap(d, w, pix); // If we do not have compositor :) */
+	XSetWindowBackgroundPixmap(d, w, pix); // If we do not have compositor :)
     XClearWindow(d,w);
     XFlush(d);
     sleep(30);
