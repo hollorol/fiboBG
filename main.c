@@ -175,7 +175,7 @@ void drawFibbTime(cairo_t* cr, int width, int height){
     drawRectangle(cr, Rs[3]);
     drawRectangle(cr, Rs[4]);
     drawRectangle(cr, Rs[0]);
-    drawReminder(cr, (t.minute % 5));
+    /* drawReminder(cr, (t.minute % 5)); */
 }
 
 int main(int argc, char** argv) {
