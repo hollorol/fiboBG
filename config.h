@@ -1,3 +1,26 @@
+#define REFRESH_TIME 30
+#define STARTPOS_Y  12
+#define STARTPOS_X  0
+#define LEFT_OFFSET 0
+#define TOP_OFFSET 12
+#define RIGHT_OFFSET 0
+#define BOTTOM_OFFSET 0
+#define BOX_HEIGHT_RATE 0.9
+#define GAP_SIZE 3 
+
+// +--------+---+-------------------
+// +        +   +                  + 
+// +        +---+                  +
+// +        +   +                  +
+// +--------+---+                  +
+// +            +                  +
+// +            +                  +
+// +            +                  +
+// +            +                  +
+// +------------+------------------+
+            
+            
+
 typedef struct _color {
     float red;
     float green;

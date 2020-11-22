@@ -1,5 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 #include <math.h>
@@ -8,6 +10,7 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 #include "config.h"
+#define VERSION "0.100"
 
 typedef struct _rectangle {
     int pos_x;
@@ -117,36 +120,56 @@ void drawReminder(cairo_t* cr, int minRem){
     }
 }
 
-void drawFibbTime(cairo_t* cr){
+
+void drawFibbTime(cairo_t* cr, int width, int height){
+
+    int bh = ((int) ((height - TOP_OFFSET) * BOX_HEIGHT_RATE) / 5) * 5;
+    int unit = bh / 5;
+    int bw = bh / 5 * 8;
+    
+    int startpos_y = STARTPOS_Y + TOP_OFFSET + ((height - TOP_OFFSET - bh)/2);
+    int startpos_x = (width - 8 * unit) / 2;
+    
     myTime t=getTime();
     int colors[5];
     getFibbTime(t, &colors);
     rectangle Rs[5];
-    Rs[2].pos_x = 10;
-    Rs[2].pos_y = 10;
-    Rs[2].width = 195;
-    Rs[2].height = 195;
+
+    // TOP-LEFT BOX ( size 2 )
+    Rs[2].pos_x = startpos_x;
+    Rs[2].pos_y = startpos_y;
+    Rs[2].width = 2 * unit - GAP_SIZE;
+    Rs[2].height = Rs[2].width;
     Rs[2].color = colors[2];
-    Rs[1].pos_x = 10;
-    Rs[1].pos_y = 210;
-    Rs[1].width = 295;
-    Rs[1].height = 295;
+
+    // BOTTOM-LEFT BOX ( size 3 )
+    Rs[1].pos_x = Rs[2].pos_x;
+    Rs[1].pos_y = Rs[2].pos_y + (2 * unit);
+    Rs[1].width = 3 * unit - GAP_SIZE;
+    Rs[1].height = Rs[1].width;
     Rs[1].color = colors[1];
-    Rs[3].pos_x = 210;
-    Rs[3].pos_y = 10;
-    Rs[3].width = 95;
-    Rs[3].height = 95;
+
+    // TOP SMALL BOX ( size 1 )
+    Rs[3].pos_x = Rs[2].pos_x + (2 * unit);
+    Rs[3].pos_y = Rs[2].pos_y;
+    Rs[3].width = 1 * unit - GAP_SIZE;
+    Rs[3].height = Rs[3].width;
     Rs[3].color = colors[3];
-    Rs[4].pos_x = 210;
-    Rs[4].pos_y = 110;
-    Rs[4].width = 95;
-    Rs[4].height = 95;
+
+    // BOTTOM SMALL BOX ( size 1 )
+    Rs[4].pos_x = Rs[3].pos_x;
+    Rs[4].pos_y = Rs[3].pos_y + (1 * unit);
+    Rs[4].width = Rs[3].width;
+    Rs[4].height = Rs[3].width;
     Rs[4].color = colors[4];
-    Rs[0].pos_x = 310;
-    Rs[0].pos_y = 10;
-    Rs[0].width = 495;
-    Rs[0].height = 495;
+
+    // LARGE BOX ( size 5 )
+    Rs[0].pos_x = Rs[3].pos_x + (1 * unit);
+    Rs[0].pos_y = Rs[2].pos_y;
+    Rs[0].width = 5 * unit - GAP_SIZE;
+    Rs[0].height = Rs[0].width;
     Rs[0].color = colors[0];
+
     drawRectangle(cr, Rs[1]);
     drawRectangle(cr, Rs[2]);
     drawRectangle(cr, Rs[3]);
@@ -155,7 +178,15 @@ void drawFibbTime(cairo_t* cr){
     drawReminder(cr, (t.minute % 5));
 }
 
-int main() {
+int main(int argc, char** argv) {
+
+    if(argc > 1){
+        if(strcmp(argv[1],"-v") == 0){
+            printf("%s\n", VERSION);
+            exit(0);
+        }
+    }
+
     int width;
     int height;
     Display *d = XOpenDisplay(NULL);
@@ -178,26 +209,18 @@ int main() {
                                   width, height);
     cairo_t *cr = cairo_create(surf);
     while(1){
-    drawFibbTime(cr);
-    XChangeProperty(d,   /* connection to x server */
-            w,    /* window whose property we want to change */
-            //prop_root = XInternAtom(disp2, "_XROOTPMAP_ID", False);
-            prop_root,   /* property name */
-            XA_PIXMAP, /* type of property */
-            32,         /* format of prop; can be 8, 16, 32 */
-            PropModeReplace,
-            (unsigned char*) &pix, /* actual data */
-            1         /* number of elements */
-            );
+        drawFibbTime(cr, width, height);
+        XChangeProperty(d, w, prop_root, XA_PIXMAP, 32, PropModeReplace,
+            (unsigned char*) &pix, 1);
 
-	XSetWindowBackgroundPixmap(d, w, pix); // If we do not have compositor :)
-    XClearWindow(d,w);
-    XFlush(d);
-    sleep(30);
+        XSetWindowBackgroundPixmap(d, w, pix); // If we do not have compositor :)
+        XClearWindow(d,w);
+        XFlush(d);
+        sleep(REFRESH_TIME);
     }
-    /* cairo_destroy(cr); */
-    /* cairo_surface_destroy(surf); */
-    /* XFreePixmap(d, pix); */
+    cairo_destroy(cr);
+    cairo_surface_destroy(surf);
+    XFreePixmap(d, pix);
     XCloseDisplay(d);
     return 0;
 }
