@@ -8,6 +8,7 @@ FiboBG is a very simple program which displays the [Fibonacci clock](https://www
 git clone https://github.com/hollorol/fiboBG.git 
 cd fiboBG
 make
+make install
 ```
 
 ## Usage
