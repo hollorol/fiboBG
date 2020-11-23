@@ -1,5 +1,6 @@
 TARGET=fiboBG
-DEST=$(HOME)/.local/bin
+DEST=$(HOME)/.local/bin #local install
+#DES=/usr/local #global install
 SRC=main.c
 # DEBUG=-g
 DEBUG=
