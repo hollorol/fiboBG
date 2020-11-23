@@ -8,7 +8,9 @@ FiboBG is a very simple program which displays the [Fibonacci clock](https://www
 git clone https://github.com/hollorol/fiboBG.git 
 cd fiboBG
 make
+make install
 ```
+The installation assumes you want to instal fiboBG locally to $HOME/.local . If you want to install it globally ( genarally not a good idea ), you can do this by modifying the Makefile.
 
 ## Usage
 In xinitrc, run the compiled program in background before window manager! If you have a compositor (only compton tested) you can make a dynamical background more usable with setting your terminal alpha parameter. 
