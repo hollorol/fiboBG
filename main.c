@@ -93,32 +93,6 @@ void drawRectangle(cairo_t* cr, rectangle R){
     cairo_fill(cr);                            /* fill rectangle */
 }
 
-void drawReminder(cairo_t* cr, int minRem){
-    float x_pos[4]={10, 810, 810, 10};
-    float y_pos[4]={10, 10, 510, 510};
-    int previous;
-
-    if(minRem == 0){
-        previous = 4;
-    } else {
-        previous = minRem - 1;
-    }
-
-    for(int i = 0; i < 4; ++i){
-        cairo_arc(cr, x_pos[i], y_pos[i],10, 0, 2 * M_PI);
-        cairo_set_source_rgb(cr, 0.5,  0.5, 0.5);   /* set fill color */
-        cairo_fill(cr);
-    }
-
-    cairo_arc(cr, x_pos[previous], y_pos[previous], 10, 0, 2 * M_PI);
-    cairo_set_source_rgb(cr, 0.5,  0.5, 0.5);   /* set fill color */
-    cairo_fill(cr);
-    if(minRem != 0){
-        cairo_arc(cr, x_pos[minRem - 1], y_pos[minRem - 1], 7, 0, 2 * M_PI);
-        cairo_set_source_rgb(cr, 0,  0, 0);   /* set fill color */
-        cairo_fill(cr);
-    }
-}
 
 
 void drawFibbTime(cairo_t* cr, int width, int height){
@@ -174,7 +148,6 @@ void drawFibbTime(cairo_t* cr, int width, int height){
     drawRectangle(cr, Rs[3]);
     drawRectangle(cr, Rs[4]);
     drawRectangle(cr, Rs[0]);
-    /* drawReminder(cr, (t.minute % 5)); */
 }
 
 int main(int argc, char** argv) {
