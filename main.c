@@ -97,6 +97,9 @@ void drawRectangle(cairo_t* cr, rectangle R){
 
 void drawFibbTime(cairo_t* cr, int width, int height){
 
+    cairo_set_source_rgb(cr, 0, 0, 0); // setting black background color
+    cairo_paint(cr); // Paint the surface with the source color
+
     int bh = ((int) ((height - TOP_OFFSET) * BOX_HEIGHT_RATE) / 5) * 5;
     int unit = bh / 5;
     
