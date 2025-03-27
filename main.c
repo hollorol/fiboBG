@@ -9,8 +9,18 @@
 #include <X11/Xatom.h>
 #include <cairo.h>
 #include <cairo-xlib.h>
+#include <signal.h> 
 #include "config.h"
 #define VERSION "0.100"
+
+// --- Globals for Signal Handling ---
+volatile sig_atomic_t running = 1; // <--- Flag to control main loop
+
+// --- Signal Handler Function ---
+void handle_signal(int signum) { // <--- Simple handler to stop the loop
+    (void) signum;
+    running = 0;
+}
 
 typedef struct _rectangle {
     int pos_x;
@@ -62,7 +72,7 @@ void getFibbTime(myTime t, int* res){
         mins[blockElement] = 1;
         minute -=  fibBlocks[blockElement] * 5;
         blockElement++;
-        
+
     }
     blockElement = 0;
     while(hour != 0){
@@ -80,17 +90,17 @@ void getFibbTime(myTime t, int* res){
     }
 
     if((*(res + 3) == 3) && (*(res + 4) ==0)){
-      *(res + 3) = 2;
-      *(res + 4) = 1;
+     *(res + 3) = 2;
+     *(res + 4) = 1;
     }
 
 }
 
 void drawRectangle(cairo_t* cr, rectangle R){
     color rectColor = colors[R.color]; // colors is defined in config.h
-    cairo_rectangle(cr, R.pos_x, R.pos_y, R.width, R.height);     /* set rectangle */
-    cairo_set_source_rgb(cr, rectColor.red, rectColor.green, rectColor.blue);   /* set fill color */
-    cairo_fill(cr);                            /* fill rectangle */
+    cairo_rectangle(cr, R.pos_x, R.pos_y, R.width, R.height);    /* set rectangle */
+    cairo_set_source_rgb(cr, rectColor.red, rectColor.green, rectColor.blue);  /* set fill color */
+    cairo_fill(cr);                          /* fill rectangle */
 }
 
 
@@ -102,10 +112,10 @@ void drawFibbTime(cairo_t* cr, int width, int height){
 
     int bh = ((int) ((height - TOP_OFFSET) * BOX_HEIGHT_RATE) / 5) * 5;
     int unit = bh / 5;
-    
+
     int startpos_y = STARTPOS_Y + TOP_OFFSET + ((height - TOP_OFFSET - bh)/2);
     int startpos_x = (width - 8 * unit) / 2;
-    
+
     myTime t=getTime();
     int colors[5];
     getFibbTime(t, (int *) &colors);
@@ -177,13 +187,19 @@ int main(int argc, char** argv) {
     pix = XCreatePixmap(d, w, width, height, depth);
     Atom prop_root;
 
-	prop_root = XInternAtom(d, "_XROOTPMAP_ID", False);
+    prop_root = XInternAtom(d, "_XROOTPMAP_ID", False);
 
     cairo_surface_t *surf = cairo_xlib_surface_create(d, pix,
-                                  DefaultVisual(d, s),
-                                  width, height);
+                                    DefaultVisual(d, s),
+                                    width, height);
     cairo_t *cr = cairo_create(surf);
-    while(1){
+
+    // --- Register Signal Handlers ---
+    signal(SIGINT, handle_signal);  // <--- Catch Ctrl+C
+    signal(SIGTERM, handle_signal); // <--- Catch standard termination signal
+
+    // --- Main Loop ---
+    while(running){ // <--- Changed loop condition
         drawFibbTime(cr, width, height);
         XChangeProperty(d, w, prop_root, XA_PIXMAP, 32, PropModeReplace,
             (unsigned char*) &pix, 1);
@@ -193,6 +209,9 @@ int main(int argc, char** argv) {
         XFlush(d);
         sleep(REFRESH_TIME);
     }
+
+    // --- Cleanup (Now reachable) ---
+    printf("\nFibonacci Clock: Shutting down gracefully...\n"); // Optional message
     cairo_destroy(cr);
     cairo_surface_destroy(surf);
     XFreePixmap(d, pix);
